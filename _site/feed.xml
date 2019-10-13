@@ -1,17 +1,356 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Vno Jekyll</title>
-    <description>Vno Jekyll is a port of my Ghost theme vno.</description>
+    <title>Hao Xie</title>
+    <description>Ph.D. candidate at IOP, CAS</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 13 Oct 2019 14:50:14 +0800</pubDate>
-    <lastBuildDate>Sun, 13 Oct 2019 14:50:14 +0800</lastBuildDate>
+    <pubDate>Sun, 13 Oct 2019 17:47:52 +0800</pubDate>
+    <lastBuildDate>Sun, 13 Oct 2019 17:47:52 +0800</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
     
       <item>
+        <title>Linear Algebra Autodiff (complex valued)</title>
+        <description>&lt;script type=&quot;text/javascript&quot; async=&quot;&quot; src=&quot;//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML&quot;&gt;
+&lt;/script&gt;
+
+&lt;script type=&quot;text/x-mathjax-config&quot;&gt;
+  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+&lt;/script&gt;
+
+&lt;p&gt;You can find the Julia implementations in &lt;a href=&quot;https://github.com/GiggleLiu/BackwardsLinalg.jl&quot;&gt;BackwardsLinalg.jl&lt;/a&gt; and &lt;a href=&quot;https://github.com/under-Peter/OMEinsum.jl&quot;&gt;OMEinsum.jl&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;einsum&quot;&gt;Einsum&lt;/h2&gt;
+&lt;hr /&gt;
+
+&lt;h3 id=&quot;definition-of-einsum&quot;&gt;Definition of Einsum&lt;/h3&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;einsum&lt;/code&gt; is defined as&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\mathbf{V}_1 \times \mathbf{V}_2 =  \begin{vmatrix}
+\mathbf{i} &amp; \mathbf{j} &amp; \mathbf{k} \\
+\frac{\partial X}{\partial u} &amp;  \frac{\partial Y}{\partial u} &amp; 0 \\
+\frac{\partial X}{\partial v} &amp;  \frac{\partial Y}{\partial v} &amp; 0 \\
+\end{vmatrix} %]]&gt;&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;O_{\vec o} = \sum\limits_{(\vec a \cup \vec b \cup \vec c \ldots) \backslash \vec o }A_{\vec a}B_{\vec b}C_{\vec c} \ldots,&lt;/script&gt;
+
+&lt;p&gt;where $\vec a = a_1, a_2\dots$ are labels that appear in tensor $A$, $\vec a\cup \vec b$ means the union of two sets of labels, $\vec a\backslash \vec b$ means setdiff between two sets of labels. The above sumation runs over all indices that does not appear in output tensor $O$.&lt;/p&gt;
+
+&lt;h2 id=&quot;autodiff&quot;&gt;Autodiff&lt;/h2&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;Given $\overline O$, In order to to obtain $\overline B \equiv \partial \mathcal{L}/\partial B$, consider the the diff rule&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align}
+\delta \mathcal{L} &amp;= \sum\limits_{\vec o} \overline O_{\vec o} \delta O_{\vec o} \\
+&amp;=\sum\limits_{\vec o\cup\vec a \cup \vec b\cup \vec c \ldots} \overline O_{\vec o}A_{\vec a}\delta B_{\vec b}C_{\vec c} \ldots
+\end{align} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;Here, we have used the (partial) differential equation&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\delta O_{\vec o} = \sum\limits_{(\vec a \cup \vec b \cup \vec c \ldots) \backslash \vec o }A_{\vec a}\delta B_{\vec b}C_{\vec c} \ldots&lt;/script&gt;
+
+&lt;p&gt;Then we define&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\overline B_{\vec b} = \sum\limits_{(\vec a \cup \vec b \cup \vec c \ldots) \backslash \vec b }A_{\vec a}\overline O_{\vec o}C_{\vec c} \ldots,&lt;/script&gt;
+
+&lt;p&gt;We can readily verify&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\delta \mathcal{L} = \sum\limits_{\vec b} \overline B_{\vec b} \delta B_{\vec b}&lt;/script&gt;
+
+&lt;p&gt;This backward rule is exactly an einsum that exchange output tensor $O$ and input tensor $B$.&lt;/p&gt;
+
+&lt;p&gt;In conclusion, the &lt;code class=&quot;highlighter-rouge&quot;&gt;index magic&lt;/code&gt; of exchanging indices as backward rule holds for einsum.&lt;/p&gt;
+
+&lt;p&gt;Thank &lt;a href=&quot;https://github.com/under-Peter&quot;&gt;Andreas Peter&lt;/a&gt; for helpful discussion.&lt;/p&gt;
+
+&lt;h2 id=&quot;symmetric-eigenvalue-decomposition-ed&quot;&gt;Symmetric Eigenvalue Decomposition (ED)&lt;/h2&gt;
+&lt;hr /&gt;
+&lt;p&gt;&lt;em&gt;references&lt;/em&gt;:&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;&lt;a href=&quot;https://arxiv.org/abs/1710.08717&quot;&gt;https://arxiv.org/abs/1710.08717&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;A = UEU^\dagger&lt;/script&gt;
+
+&lt;p&gt;We have&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\overline{A} = U\left[\overline{E} + \frac{1}{2}\left(\overline{U}^\dagger U \circ F + h.c.\right)\right]U^\dagger&lt;/script&gt;
+
+&lt;p&gt;Where $F_{ij}=(E_j- E_i)^{-1}$.&lt;/p&gt;
+
+&lt;p&gt;If $E$ is continuous, we define the density $\rho(E) = \sum\limits_k \delta(E-E_k)=-\frac{1}{\pi}\int_k \Im[G^r(E, k)] $ (check sign!). Where $G^r(E, k) = \frac{1}{E-E_k+i\delta}$.&lt;/p&gt;
+
+&lt;p&gt;We have
+&lt;script type=&quot;math/tex&quot;&gt;\overline{A} = U\left[\overline{E} + \frac{1}{2}\left(\overline{U}^\dagger U \circ \Re [G(E_i, E_j)] + h.c.\right)\right]U^\dagger&lt;/script&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;singular-value-decomposition-svd&quot;&gt;Singular Value Decomposition (SVD)&lt;/h2&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;em&gt;references&lt;/em&gt;:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;a href=&quot;https://people.maths.ox.ac.uk/gilesm/files/NA-08-01.pdf&quot;&gt;https://people.maths.ox.ac.uk/gilesm/files/NA-08-01.pdf&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://j-towns.github.io/papers/svd-derivative.pdf&quot;&gt;https://j-towns.github.io/papers/svd-derivative.pdf&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://arxiv.org/abs/1907.13422&quot;&gt;https://arxiv.org/abs/1907.13422&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Complex valued SVD is defined as $A = USV^\dagger$. For simplicity, we consider a &lt;strong&gt;full rank square matrix&lt;/strong&gt; $A$.
+Differentiation gives&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;dA = dUSV^\dagger + U dS V^\dagger + USdV^\dagger&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;U^\dagger dA V = U^\dagger dU S + dS + SdV^\dagger V&lt;/script&gt;
+
+&lt;p&gt;Defining matrices $dC=U^\dagger dU$ and $dD = dV^\dagger V$ and $dP = U^\dagger dA V$, then we have&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{cases}dC^\dagger+dC=0,\\dD^\dagger +dD=0\end{cases}&lt;/script&gt;
+
+&lt;p&gt;We have&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;dP = dC S + dS + SdD&lt;/script&gt;
+
+&lt;p&gt;where $dCS$ and $SdD$ has zero real part in diagonal elements. So that $dS = \Re[{\rm diag}(dP)]$.&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align}
+d\mathcal{L} &amp;= {\rm Tr}\left[\overline{A}^TdA+\overline{A^*}^TdA^*\right]\\
+&amp;= {\rm Tr}\left[\overline{A}^TdA+dA^\dagger\overline{A}^*\right] ~~~~~~~\#rule~3
+\end{align} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;Easy to show $\overline A_s = U^*\overline SV^T$. Notice here, $\overline A$ is the &lt;strong&gt;derivative&lt;/strong&gt; rather than &lt;strong&gt;gradient&lt;/strong&gt;, they are different by a conjugate, this is why we have transpose rather than conjugate here. see my &lt;a href=&quot;https://giggleliu.github.io/2018/02/01/complex_bp.html&quot;&gt;complex valued autodiff blog&lt;/a&gt; for detail.&lt;/p&gt;
+
+&lt;p&gt;Using the relations $dC^\dagger+dC=0$ and $dD^\dagger+dD=0$&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{cases}
+dPS + SdP^\dagger &amp;= dC S^2-S^2dC\\
+SdP + dP^\dagger S &amp;= S^2dD-dD S^2
+\end{cases} %]]&gt;&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{cases}
+dC = F\circ(dPS+SdP^\dagger)\\
+dD = -F\circ (SdP+dP^\dagger S)
+\end{cases}&lt;/script&gt;
+
+&lt;p&gt;where $F_{ij} = \frac{1}{s_j^2-s_i^2}$, easy to verify $F^T = -F$. Notice here, the relation between the imaginary diagonal parts  is lost&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\color{red}{\Im[I\circ dP] = \Im[I\circ(dC+dD)]} ~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~\text{Eq. 1}&lt;/script&gt;
+
+&lt;p&gt;This &lt;strong&gt;the missing diagonal imaginary part&lt;/strong&gt; is definitely not trivial, but has been ignored for a long time until &lt;a href=&quot;https://github.com/tensorflow/tensorflow/issues/13641#issuecomment-526976200&quot;&gt;@refraction-ray&lt;/a&gt; (Shixin Zhang) mentioned and solved it. Let’s first focus on the off-diagonal contributions from $dU$&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align}
+{\rm Tr}\overline U^TdU &amp;= {\rm Tr} \overline U ^TU dC + \overline U^T (I-UU^\dagger) dAVS^{-1}\\
+&amp;= {\rm Tr}\overline U^T U (F\circ(dPS+SdP^\dagger))\\
+ &amp;=  {\rm Tr}(dPS+SdP^\dagger)(-F\circ (\overline U^T U))~~~~~~~~~~~~~~\# rule~1,2\\
+ &amp;= {\rm Tr}(dPS+SdP^\dagger)J^T
+\end{align} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;Here, we defined $J=F\circ(U^T\overline U)$.&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align}
+d\mathcal L &amp;= {\rm Tr} (dPS+SdP^\dagger)(J+J^\dagger)^T\\
+&amp;= {\rm Tr} dPS(J+J^\dagger)^T+h.c.\\
+&amp;= {\rm Tr} U^\dagger dA V S(J+J^\dagger)^T+h.c.\\
+&amp;= {\rm Tr}\left[ VS(J+J^\dagger)^TU^\dagger\right] dA+h.c.
+\end{align} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;By comparing with $d\mathcal L = {\rm Tr}\left[\overline{A}^TdA+h.c. \right]$, we have&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align}
+\bar A_U^{(\rm real)} &amp;=  \left[VS(J+J^\dagger)^TU^\dagger\right]^T\\
+&amp;=U^*(J+J^\dagger)SV^T
+\end{align} %]]&gt;&lt;/script&gt;
+
+&lt;h4 id=&quot;update-the-missing-diagonal-imaginary-part&quot;&gt;Update: The missing diagonal imaginary part&lt;/h4&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;Now let’s inspect the diagonal imaginary parts of $dC$ and $dD$ in Eq. 1. At a first glance, it is not sufficient to derive $dC$ and $dD$ from $dP$, but consider there is still an information not used, &lt;strong&gt;the loss must be gauge invariant&lt;/strong&gt;, which means&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mathcal{L}(U\Lambda, S, V\Lambda)&lt;/script&gt;
+
+&lt;p&gt;Should be independent of the choice of gauge $\Lambda$, which is defined as ${\rm diag}(e^i\phi, …)$&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align}
+d\mathcal{L} &amp;={\rm Tr}[ \overline{U\Lambda}^T d(U\Lambda) +\overline  SdS+\overline{V\Lambda}^Td(V\Lambda)] + h.c.\\
+&amp;={\rm Tr}[ \overline {U\Lambda}^T (dU\Lambda+Ud\Lambda) +\overline{S}dS+  \overline{V\Lambda}^T(Vd\Lambda +dV\Lambda)] + h.c.\\
+&amp;= {\rm Tr}[(\overline{U\Lambda}^TU+\overline{V\Lambda}^TV )d\Lambda ] + \ldots + h.c.
+\end{align} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;Gauge invariance refers to&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\overline{\Lambda} =  I\circ(\overline{U\Lambda}^TU+\overline{V\Lambda}^TV) = 0&lt;/script&gt;
+
+&lt;p&gt;For any $\Lambda$, where $I$ refers to the diagonal mask matrix. It is of cause valid when $\Lambda\rightarrow1$, $I\circ(\overline{U}^TU+\overline V^TV) = 0$.&lt;/p&gt;
+
+&lt;p&gt;Consider the contribution from the &lt;strong&gt;diagonal imaginary part&lt;/strong&gt;, we have&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align}
+&amp;{\rm Tr} [\overline U^T U (I \circ \Im [dC])+\overline V^T V (I \circ \Im [dD^\dagger])] + h.c.\\
+&amp;={\rm Tr} [ I \circ (\overline U^T U)\Im [dC]-I\circ (\overline V^T V) \Im [dD]] +h.c. ~~~~~~~~~~~~~~\#  rule 1\\
+&amp;={\rm Tr} [ I \circ (\overline U^T U)(\Im [dC]+ \Im [dD])] \\
+&amp;={\rm Tr}[I\circ (\overline U^T U) \Im[dP]S^{-1}]  \\
+&amp;={\rm Tr}[S^{-1}\Lambda_J U^{\dagger}dA V]\\
+\end{align} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;where $\Lambda_J  = \Im[I\circ(\overline U^TU)]= \frac 1 2I\circ(\overline U^TU)-h.c.$, with $I$ the mask for diagonal part. Since only the real part contribute to $\delta \mathcal{L}$ (the imaginary part will be canceled by the Hermitian conjugate counterpart), we can safely move $\Im$ from right to left.&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align}
+\color{red}{\bar A_{U+V}^{(\rm imag)} = U^*\Lambda_J S^{-1}V^T}
+\end{align}&lt;/script&gt;
+
+&lt;p&gt;&lt;strong&gt;Thanks  &lt;a href=&quot;https://github.com/refraction-ray&quot;&gt;@refraction-ray&lt;/a&gt; (Shixin Zhang) for sharing his idea in the first time. This is the &lt;a href=&quot;https://github.com/tensorflow/tensorflow/issues/13641#issuecomment-526976200&quot;&gt;issue for discussion&lt;/a&gt;. His arXiv preprint is coming out soon.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;When $U$ is &lt;strong&gt;not full rank&lt;/strong&gt;, this formula should take an extra term (Ref. 2)&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align}
+\bar A_U^{(\rm real)} &amp;=U^*(J+J^\dagger)SV^T + (VS^{-1}\overline U^T(I-UU^\dagger))^T
+\end{align} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;Similarly, for $V​$ we have&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align}
+\overline A_V^{(\rm real)} &amp;=U^*S(K+K^\dagger)V^T + (U S^{-1} \overline V^T (I - VV^\dagger))^*,
+\end{align} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;where $K=F\circ(V^T\overline V)​$.&lt;/p&gt;
+
+&lt;p&gt;To wrap up&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\overline A = \overline A_U^{\rm (real)} + \overline A_S + \overline A_V^{\rm (real)} +  \overline A_{U+V}^{\rm (imag)}&lt;/script&gt;
+
+&lt;p&gt;This result can be directly used in &lt;strong&gt;autograd&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;For the &lt;strong&gt;gradient&lt;/strong&gt; used in training, one should change the convention&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mathcal{\overline A} = \overline A^*,\\ \mathcal{\overline U} = \overline U^*,\\ \mathcal{\overline V}= \overline V^*.&lt;/script&gt;
+
+&lt;p&gt;This convention is used in &lt;strong&gt;tensorflow&lt;/strong&gt;, &lt;strong&gt;Zygote.jl&lt;/strong&gt;. Which is&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align}
+\mathcal{\overline A} =&amp; U(\mathcal{J}+\mathcal{J}^\dagger)SV^\dagger + (I-UU^\dagger)\mathcal{\overline U}S^{-1}V^\dagger\\
+&amp;+ U\overline SV^\dagger\\
+&amp;+US(\mathcal{K}+\mathcal{K}^\dagger)V^\dagger + U S^{-1} \mathcal{\overline V}^\dagger (I - VV^\dagger)\\
+&amp;\color{red}{+\frac 1 2 U (I\circ(U^\dagger\overline U)-h.c.)S^{-1}V^\dagger}
+\end{align} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;where $J=F\circ(U^\dagger\mathcal{\overline U})$ and $K=F\circ(V^\dagger \mathcal{\overline V})$.&lt;/p&gt;
+
+&lt;h3 id=&quot;rules&quot;&gt;Rules&lt;/h3&gt;
+
+&lt;p&gt;rule 1. ${\rm Tr} \left[A(C\circ B\right)] = \sum A^T\circ C\circ B = {\rm Tr} ((C\circ A^T)^TB)={\rm Tr}(C^T\circ A)B$&lt;/p&gt;
+
+&lt;p&gt;rule2. $(C\circ A)^T = C^T \circ A^T$&lt;/p&gt;
+
+&lt;p&gt;rule3. When $\mathcal L$ is real, &lt;script type=&quot;math/tex&quot;&gt;\frac{\partial \mathcal{L}}{\partial x^*} =  \left(\frac{\partial \mathcal{L}}{\partial x}\right)^*&lt;/script&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;how-to-test-svd&quot;&gt;How to Test SVD&lt;/h3&gt;
+
+&lt;p&gt;e.g. To test the adjoint contribution from $U$, we can construct a gauge insensitive  test function&lt;/p&gt;
+
+&lt;div class=&quot;language-julia highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# H is a random Hermitian Matrix&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt; loss&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;V&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;svd&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;psi&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;]&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;psi&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;H&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;psi&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt; gradient&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;V&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;svd&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;dU&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;zero&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;dS&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;zero&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;dV&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;zero&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;V&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;dU&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;H&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;dA&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;svd_back&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;V&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dU&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dS&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dV&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;dA&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;qr-decomposition&quot;&gt;QR decomposition&lt;/h2&gt;
+&lt;hr /&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;A = QR&lt;/script&gt;
+
+&lt;p&gt;with $Q^\dagger Q = \mathbb{I}$, so that $dQ^\dagger Q+Q^\dagger dQ=0$. $R$ is a complex upper triangular matrix, with diagonal part real.
+&lt;script type=&quot;math/tex&quot;&gt;dA = dQR+QdR&lt;/script&gt;&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;dQ = dAR^{-1}-QdRR^{-1}&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{cases}
+Q^\dagger dQ = dC - dRR^{-1}\\
+dQ^\dagger Q =dC^\dagger - R^{-\dagger}dR^\dagger
+\end{cases}&lt;/script&gt;
+
+&lt;p&gt;where $dC=Q^\dagger dAR^{-1}$.&lt;/p&gt;
+
+&lt;p&gt;Then&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;dC+dC^\dagger = dRR^{-1} +(dRR^{-1})^\dagger&lt;/script&gt;
+
+&lt;p&gt;Notice $dR$ is upper triangular and its diag is lower triangular, this restriction gives&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;U\circ(dC+dC^\dagger) = dRR^{-1}&lt;/script&gt;
+
+&lt;p&gt;where $U$ is a mask operator that its element value is $1$ for upper triangular part, $0.5$ for diagonal part and $0$ for lower triangular part. One should also notice here both $R$ and $dR$ has real diagonal parts, as well as the product $dRR^{-1}$.&lt;/p&gt;
+
+&lt;p&gt;Now let’s wrap up using the Zygote convension of gradient&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align}
+d\mathcal L &amp;= {\rm Tr}\left[\overline{\mathcal{Q}}^\dagger dQ+\overline{\mathcal{R}}^\dagger dR +h.c. \right]\\
+&amp;={\rm Tr}\left[\overline{\mathcal{Q}}^\dagger dA R^{-1}-\overline{\mathcal{Q}}^\dagger QdR
+R^{-1}+\overline{\mathcal{R}}^\dagger dR +h.c. \right]\\
+&amp;={\rm Tr}\left[ R^{-1}\overline{\mathcal{Q}}^\dagger dA+ R^{-1}(-\overline{\mathcal{Q}}^\dagger Q +R\overline{\mathcal{R}}^\dagger) dR +h.c. \right]\\
+&amp;={\rm Tr}\left[ R^{-1}\overline{\mathcal{Q}}^\dagger dA+ R^{-1}M dR +h.c. \right]
+\end{align} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;here, $M=R\overline{\mathcal{R}}^\dagger-\overline{\mathcal{Q}}^\dagger Q$. Plug in $dR$ we have&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align}
+d\mathcal{L}&amp;={\rm Tr}\left[ R^{-1}\overline{\mathcal{Q}}^\dagger dA + M \left[U\circ(dC+dC^\dagger)\right] +h.c. \right]\\
+&amp;={\rm Tr}\left[ R^{-1}\overline{\mathcal{Q}}^\dagger dA + (M\circ L)(dC+dC^\dagger) +h.c. \right]  \;\;\# rule\; 1\\
+&amp;={\rm Tr}\left[ (R^{-1}\overline{\mathcal{Q}}^\dagger dA+h.c.) + (M\circ L)(dC + dC^\dagger)+ (M\circ L)^\dagger (dC + dC^\dagger)\right]\\
+&amp;={\rm Tr}\left[ R^{-1}\overline{\mathcal{Q}}^\dagger dA + (M\circ L+h.c.)dC + h.c.\right]\\
+&amp;={\rm Tr}\left[ R^{-1}\overline{\mathcal{Q}}^\dagger dA + (M\circ L+h.c.)Q^\dagger dAR^{-1}\right]+h.c.\\
+\end{align} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;where $L =U^\dagger = 1-U$ is the mask of lower triangular part of a matrix.&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align}
+\mathcal{\overline A}^\dagger &amp;= R^{-1}\left[\overline{\mathcal{Q}}^\dagger + (M\circ L+h.c.)Q^\dagger\right]\\
+\mathcal{\overline A} &amp;= \left[\overline{\mathcal{Q}} + Q(M\circ L+h.c.)\right]R^{-\dagger}\\
+&amp;=\left[\overline{\mathcal{Q}} + Q \texttt{copyltu}(M)\right]R^{-\dagger}
+\end{align} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;Here, the $\texttt{copyltu}​$ takes conjugate when copying elements to upper triangular part.&lt;/p&gt;
+</description>
+        <pubDate>Sun, 13 Oct 2019 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2019/10/test/</link>
+        <guid isPermaLink="true">http://localhost:4000/2019/10/test/</guid>
+        
+        
+      </item>
+    
+      <item>
         <title>Hello World - Vno</title>
-        <description>&lt;h4 id=&quot;whats-this&quot;&gt;What’s this&lt;/h4&gt;
+        <description>&lt;script type=&quot;text/javascript&quot; src=&quot;http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;[toc]&lt;/p&gt;
+&lt;h2 id=&quot;this-is-a-2nd-title&quot;&gt;This is a 2nd title.&lt;/h2&gt;
+&lt;h4 id=&quot;whats-this&quot;&gt;What’s this&lt;/h4&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://github.com/onevcat/vno-jekyll&quot;&gt;Vno Jekyll&lt;/a&gt; is a theme for &lt;a href=&quot;http://jekyllrb.com&quot;&gt;Jekyll&lt;/a&gt;. It is a port of my Ghost theme &lt;a href=&quot;https://github.com/onevcat/vno&quot;&gt;vno&lt;/a&gt;, which is originally developed from &lt;a href=&quot;https://github.com/daleanthony/uno&quot;&gt;Dale Anthony’s Uno&lt;/a&gt;.&lt;/p&gt;
 
@@ -22,6 +361,22 @@
 &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;bundler &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt;
 &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;bundler &lt;span class=&quot;nb&quot;&gt;exec &lt;/span&gt;jekyll serve
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-c highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;#include &amp;lt;stdio.h&amp;gt;
+&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;argc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[])&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;hello, world!&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\sin(x + y) = \sin(x) \cos(y) + \cos(x) \sin(y)&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\mathbf{V}_1 \times \mathbf{V}_2 =  \begin{vmatrix}
+\mathbf{i} &amp; \mathbf{j} &amp; \mathbf{k} \\
+\frac{\partial X}{\partial u} &amp;  \frac{\partial Y}{\partial u} &amp; 0 \\
+\frac{\partial X}{\partial v} &amp;  \frac{\partial Y}{\partial v} &amp; 0 \\
+\end{vmatrix} %]]&gt;&lt;/script&gt;
 
 &lt;p&gt;Your site with &lt;code class=&quot;highlighter-rouge&quot;&gt;Vno Jekyll&lt;/code&gt; enabled should be accessible in http://127.0.0.1:4000.&lt;/p&gt;
 
@@ -73,30 +428,6 @@
         <pubDate>Tue, 16 Feb 2016 14:32:24 +0800</pubDate>
         <link>http://localhost:4000/2016/02/hello-world-vno/</link>
         <guid isPermaLink="true">http://localhost:4000/2016/02/hello-world-vno/</guid>
-        
-        
-      </item>
-    
-      <item>
-        <title>Sample Post</title>
-        <description>&lt;p&gt;You’ll find this post in your &lt;code class=&quot;highlighter-rouge&quot;&gt;_posts&lt;/code&gt; directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run &lt;code class=&quot;highlighter-rouge&quot;&gt;jekyll serve&lt;/code&gt;, which launches a web server and auto-regenerates your site when a file is updated.&lt;/p&gt;
-
-&lt;p&gt;To add new posts, simply add a file in the &lt;code class=&quot;highlighter-rouge&quot;&gt;_posts&lt;/code&gt; directory that follows the convention &lt;code class=&quot;highlighter-rouge&quot;&gt;YYYY-MM-DD-name-of-post.ext&lt;/code&gt; and includes the necessary front matter. Take a look at the source for this post to get an idea about how it works.&lt;/p&gt;
-
-&lt;p&gt;Jekyll also offers powerful support for code snippets:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Hi, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Tom'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;#=&amp;gt; prints 'Hi, Tom' to STDOUT.&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;Check out the &lt;a href=&quot;http://jekyllrb.com/docs/home&quot;&gt;Jekyll docs&lt;/a&gt; for more info on how to get the most out of Jekyll. File all bugs/feature requests at &lt;a href=&quot;https://github.com/jekyll/jekyll&quot;&gt;Jekyll’s GitHub repo&lt;/a&gt;. If you have questions, you can ask them on &lt;a href=&quot;https://talk.jekyllrb.com/&quot;&gt;Jekyll Talk&lt;/a&gt;.&lt;/p&gt;
-
-</description>
-        <pubDate>Mon, 15 Feb 2016 14:32:24 +0800</pubDate>
-        <link>http://localhost:4000/2016/02/sample-post/</link>
-        <guid isPermaLink="true">http://localhost:4000/2016/02/sample-post/</guid>
         
         
       </item>

@@ -1,9 +1,12 @@
 ---
-layout: post
+layout: page
 title: Hello World - Vno
 date: 2016-02-16 15:32:24.000000000 +09:00
 ---
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
 
+[toc]
+## This is a 2nd title.
 #### What's this
 
 [Vno Jekyll](https://github.com/onevcat/vno-jekyll) is a theme for [Jekyll](http://jekyllrb.com). It is a port of my Ghost theme [vno](https://github.com/onevcat/vno), which is originally developed from [Dale Anthony's Uno](https://github.com/daleanthony/uno).
@@ -16,6 +19,26 @@ $ cd your_site
 $ bundler install
 $ bundler exec jekyll serve
 ```
+
+```c
+#include <stdio.h>
+int main(int argc, char* argv[]) {
+    printf("hello, world!\n");
+    return 0;
+}
+```
+
+$$
+    \sin(x + y) = \sin(x) \cos(y) + \cos(x) \sin(y)
+$$
+
+$$
+\mathbf{V}_1 \times \mathbf{V}_2 =  \begin{vmatrix}
+\mathbf{i} & \mathbf{j} & \mathbf{k} \\
+\frac{\partial X}{\partial u} &  \frac{\partial Y}{\partial u} & 0 \\
+\frac{\partial X}{\partial v} &  \frac{\partial Y}{\partial v} & 0 \\
+\end{vmatrix}
+$$
 
 Your site with `Vno Jekyll` enabled should be accessible in http://127.0.0.1:4000.
 
