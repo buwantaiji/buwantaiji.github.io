@@ -5,12 +5,12 @@
     <description>Ph.D. candidate at IOP, CAS</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 13 Oct 2019 17:55:23 +0800</pubDate>
-    <lastBuildDate>Sun, 13 Oct 2019 17:55:23 +0800</lastBuildDate>
+    <pubDate>Tue, 15 Oct 2019 15:13:37 +0800</pubDate>
+    <lastBuildDate>Tue, 15 Oct 2019 15:13:37 +0800</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
     
       <item>
-        <title>Linear Algebra Autodiff (complex valued)</title>
+        <title>The adjoint method and its application in back-propagation of dominant eigen-decomposition</title>
         <description>&lt;script type=&quot;text/javascript&quot; async=&quot;&quot; src=&quot;//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML&quot;&gt;
 &lt;/script&gt;
 
@@ -18,328 +18,275 @@
   MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
 &lt;/script&gt;
 
-&lt;p&gt;You can find the Julia implementations in &lt;a href=&quot;https://github.com/GiggleLiu/BackwardsLinalg.jl&quot;&gt;BackwardsLinalg.jl&lt;/a&gt; and &lt;a href=&quot;https://github.com/under-Peter/OMEinsum.jl&quot;&gt;OMEinsum.jl&lt;/a&gt;.&lt;/p&gt;
+&lt;script type=&quot;text/x-mathjax-config&quot;&gt;   MathJax.Hub.Config({     TeX: { equationNumbers: { autoNumber: &quot;all&quot; } }   }); &lt;/script&gt;
 
-&lt;h2 id=&quot;einsum&quot;&gt;Einsum&lt;/h2&gt;
+&lt;p&gt;The adjoint method provides a new way of thinking about and deriving  formulas for certain computation process. In this article, we will present the basic ideas of the adjoint method and, as a concrete example, demonstrate its consequences in back-propagation of the dominant eigen-decomposition and its relation with the traditional approach.&lt;/p&gt;
+
+&lt;p&gt;$\renewcommand{\vec}[1]{\mathbf{#1}}$&lt;/p&gt;
+
+&lt;h2 id=&quot;basic-ideas-of-the-adjoint-method&quot;&gt;Basic ideas of the adjoint method&lt;/h2&gt;
+
 &lt;hr /&gt;
 
-&lt;h3 id=&quot;definition-of-einsum&quot;&gt;Definition of Einsum&lt;/h3&gt;
+&lt;p&gt;Consider a simple computation process, in which the setting is as follows. Let $\vec{p} = (p_1,\cdots, p_P)$ be a $P$-dimensional input vector of parameters, and the output $\vec{x} = (x_1, \cdots, x_M)^T$ is a $M$-dimensional (column)  vector. They are related by $M$ equations of the form $f_i(\vec{x}, \vec{p}) = 0$, where $i$ ranges from $1$ to $M$.&lt;/p&gt;
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;einsum&lt;/code&gt; is defined as&lt;/p&gt;
+&lt;p&gt;What we need is the back-propagation of this process, in which the adjoint $\overline{\vec{p}} \equiv \frac{\partial \mathcal{L}}{\partial \vec{p}}$ of input is expressed as a function of the adjoint $\overline{\vec{x}} \equiv \frac{\partial \mathcal{L}}{\partial \vec{x}}$ of output. We have&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\overline{p_\mu} = \overline{\vec{x}}^T \frac{\partial \vec{x}}{\partial p_\mu}, 
+\quad \forall \mu = 1, \cdots, P.
+\label{eq: adjointp}&lt;/script&gt;
+
+&lt;p&gt;where the $M$-dimensional column vector $\frac{\partial \vec{x}}{\partial p_\mu}$ is determined by&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\frac{\partial f_i}{\partial p_\mu} + 
+\frac{\partial f_i}{\partial \vec{x}} \frac{\partial \vec{x}}{\partial p_\mu} = 0, 
+\quad \forall i = 1, \cdots, M.&lt;/script&gt;
+
+&lt;p&gt;Or, we can express this in a more compact form as follows:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\frac{\partial f}{\partial p_\mu} + 
+\frac{\partial f}{\partial \vec{x}} \frac{\partial \vec{x}}{\partial p_\mu} = 0.
+\label{eq: partialxpartialp}&lt;/script&gt;
+
+&lt;p&gt;where&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\mathbf{V}_1 \times \mathbf{V}_2 =  \begin{vmatrix}
-\mathbf{i} &amp; \mathbf{j} &amp; \mathbf{k} \\
-\frac{\partial X}{\partial u} &amp;  \frac{\partial Y}{\partial u} &amp; 0 \\
-\frac{\partial X}{\partial v} &amp;  \frac{\partial Y}{\partial v} &amp; 0 \\
-\end{vmatrix} %]]&gt;&lt;/script&gt;
+\frac{\partial f}{\partial p_\mu} = 
+\begin{pmatrix}
+	\frac{\partial f_1}{\partial p_\mu} \\ \vdots \\
+	\frac{\partial f_M}{\partial p_\mu}
+\end{pmatrix}, \quad
+\frac{\partial f}{\partial \vec{x}} = 
+\begin{pmatrix}
+	\text{—} &amp; \frac{\partial f_1}{\partial \vec{x}} &amp; \text{—} \\
+	&amp; \vdots \\
+	\text{—} &amp; \frac{\partial f_M}{\partial \vec{x}} &amp; \text{—}
+\end{pmatrix} %]]&gt;&lt;/script&gt;
 
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;O_{\vec o} = \sum\limits_{(\vec a \cup \vec b \cup \vec c \ldots) \backslash \vec o }A_{\vec a}B_{\vec b}C_{\vec c} \ldots,&lt;/script&gt;
-
-&lt;p&gt;where $\vec a = a_1, a_2\dots$ are labels that appear in tensor $A$, $\vec a\cup \vec b$ means the union of two sets of labels, $\vec a\backslash \vec b$ means setdiff between two sets of labels. The above sumation runs over all indices that does not appear in output tensor $O$.&lt;/p&gt;
-
-&lt;h2 id=&quot;autodiff&quot;&gt;Autodiff&lt;/h2&gt;
-&lt;hr /&gt;
-
-&lt;p&gt;Given $\overline O$, In order to to obtain $\overline B \equiv \partial \mathcal{L}/\partial B$, consider the the diff rule&lt;/p&gt;
+&lt;p&gt;Assuming the $M \times M$ matrix $\frac{\partial f}{\partial \vec{x}}$ is invertible, one can solve for $\frac{\partial \vec{x}}{\partial p_\mu}$ from Eq. $\eqref{eq: partialxpartialp}$, then substitute it back into Eq. $\eqref{eq: adjointp}$ to get the final result:&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
 \begin{align}
-\delta \mathcal{L} &amp;= \sum\limits_{\vec o} \overline O_{\vec o} \delta O_{\vec o} \\
-&amp;=\sum\limits_{\vec o\cup\vec a \cup \vec b\cup \vec c \ldots} \overline O_{\vec o}A_{\vec a}\delta B_{\vec b}C_{\vec c} \ldots
+	\overline{p_\mu} &amp;= -\overline{\vec{x}}^T \left( \frac{\partial f}{\partial \vec{x}} 	\right)^{-1} \frac{\partial f}{\partial p_\mu} \\
+    				 &amp;= -\boldsymbol{\lambda}^T \frac{\partial f}{\partial p_\mu}.
+	\quad \forall \mu = 1, \cdots, P.
+	\label{eq: adjointp in general case}
 \end{align} %]]&gt;&lt;/script&gt;
 
-&lt;p&gt;Here, we have used the (partial) differential equation&lt;/p&gt;
+&lt;p&gt;where the column vector $\boldsymbol{\lambda}$ is determined by&lt;/p&gt;
 
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\delta O_{\vec o} = \sum\limits_{(\vec a \cup \vec b \cup \vec c \ldots) \backslash \vec o }A_{\vec a}\delta B_{\vec b}C_{\vec c} \ldots&lt;/script&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\left( \frac{\partial f}{\partial \vec{x}} 	\right)^T \boldsymbol{\lambda} = 
+\overline{\vec{x}}.
+\label{eq: lambda in general case}&lt;/script&gt;
 
-&lt;p&gt;Then we define&lt;/p&gt;
+&lt;h2 id=&quot;example-dominant-eigen-decomposition&quot;&gt;Example: dominant eigen-decomposition&lt;/h2&gt;
 
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\overline B_{\vec b} = \sum\limits_{(\vec a \cup \vec b \cup \vec c \ldots) \backslash \vec b }A_{\vec a}\overline O_{\vec o}C_{\vec c} \ldots,&lt;/script&gt;
-
-&lt;p&gt;We can readily verify&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\delta \mathcal{L} = \sum\limits_{\vec b} \overline B_{\vec b} \delta B_{\vec b}&lt;/script&gt;
-
-&lt;p&gt;This backward rule is exactly an einsum that exchange output tensor $O$ and input tensor $B$.&lt;/p&gt;
-
-&lt;p&gt;In conclusion, the &lt;code class=&quot;highlighter-rouge&quot;&gt;index magic&lt;/code&gt; of exchanging indices as backward rule holds for einsum.&lt;/p&gt;
-
-&lt;p&gt;Thank &lt;a href=&quot;https://github.com/under-Peter&quot;&gt;Andreas Peter&lt;/a&gt; for helpful discussion.&lt;/p&gt;
-
-&lt;h2 id=&quot;symmetric-eigenvalue-decomposition-ed&quot;&gt;Symmetric Eigenvalue Decomposition (ED)&lt;/h2&gt;
-&lt;hr /&gt;
-&lt;p&gt;&lt;em&gt;references&lt;/em&gt;:&lt;/p&gt;
-&lt;ol&gt;
-  &lt;li&gt;&lt;a href=&quot;https://arxiv.org/abs/1710.08717&quot;&gt;https://arxiv.org/abs/1710.08717&lt;/a&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;A = UEU^\dagger&lt;/script&gt;
-
-&lt;p&gt;We have&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\overline{A} = U\left[\overline{E} + \frac{1}{2}\left(\overline{U}^\dagger U \circ F + h.c.\right)\right]U^\dagger&lt;/script&gt;
-
-&lt;p&gt;Where $F_{ij}=(E_j- E_i)^{-1}$.&lt;/p&gt;
-
-&lt;p&gt;If $E$ is continuous, we define the density $\rho(E) = \sum\limits_k \delta(E-E_k)=-\frac{1}{\pi}\int_k \Im[G^r(E, k)] $ (check sign!). Where $G^r(E, k) = \frac{1}{E-E_k+i\delta}$.&lt;/p&gt;
-
-&lt;p&gt;We have
-&lt;script type=&quot;math/tex&quot;&gt;\overline{A} = U\left[\overline{E} + \frac{1}{2}\left(\overline{U}^\dagger U \circ \Re [G(E_i, E_j)] + h.c.\right)\right]U^\dagger&lt;/script&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;singular-value-decomposition-svd&quot;&gt;Singular Value Decomposition (SVD)&lt;/h2&gt;
 &lt;hr /&gt;
 
-&lt;p&gt;&lt;em&gt;references&lt;/em&gt;:&lt;/p&gt;
+&lt;p&gt;As a concrete example of the adjoint method, consider the dominant eigen-decomposition process, in which a certain eigenvalue $\alpha$ and corresponding eigenvector $\vec{x}$ of $A$ is returned (assuming the eigenvalue is non-degenerate), where $A = A(\vec{p})$ is a $N \times N$ real symmetric matrix depending on the parameter $\vec{p}$.&lt;/p&gt;
 
-&lt;ol&gt;
+&lt;p&gt;Note that in the current case, the output can be effectively treated as a vector of dimension $N + 1$. The correspondence with the general notations in the last section is thus as follows:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\vec{x} \rightarrow \begin{pmatrix}
+						\vec{x} \\ \alpha
+					\end{pmatrix}, \quad
+\overline{\vec{x}} \rightarrow \begin{pmatrix}
+						\overline{\vec{x}} \\ \overline{\alpha}
+					\end{pmatrix}, \quad
+\boldsymbol{\lambda} \rightarrow \begin{pmatrix}
+									\boldsymbol{\lambda} \\ k
+								 \end{pmatrix}, \quad
+\frac{\partial f}{\partial p_\mu} \rightarrow
+\begin{pmatrix}
+	\frac{\partial f_1}{\partial p_\mu} \\ \vdots \\
+	\frac{\partial f_N}{\partial p_\mu} \\
+	\frac{\partial f_0}{\partial p_\mu}
+\end{pmatrix}, \\
+\left( \frac{\partial f}{\partial \vec{x}} 	\right)^T = 
+\begin{pmatrix}
+	\vert &amp; &amp; \vert \\
+	\left( \frac{\partial f_1}{\partial \vec{x}} \right)^T &amp; \cdots &amp; 
+	\left( \frac{\partial f_M}{\partial \vec{x}} \right)^T \\
+	\vert &amp; &amp; \vert
+\end{pmatrix} \rightarrow
+\left(\begin{array}{ccc|c}
+	\vert &amp; &amp; \vert &amp; \vert \\
+	\left( \frac{\partial f_1}{\partial \vec{x}} \right)^T &amp; \cdots &amp; 
+	\left( \frac{\partial f_N}{\partial \vec{x}} \right)^T &amp; 
+	\left( \frac{\partial f_0}{\partial \vec{x}} \right)^T \\
+	\vert &amp; &amp; \vert &amp; \vert \\ \hline
+	\frac{\partial f_1}{\partial \alpha} &amp; \cdots &amp; 
+	\frac{\partial f_N}{\partial \alpha} &amp; 
+	\frac{\partial f_0}{\partial \alpha}
+\end{array}\right). %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;The $N + 1$ equations $f_i(\vec{x}, \alpha, \vec{p}) = 0$ are given by&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;f_i(\vec{x}, \alpha, \vec{p}) = (A - \alpha I)_i^T \vec{x}, \quad \forall i = 1, \cdots, N. \\
+f_0(\vec{x}, \alpha, \vec{p}) = \vec{x}^T \vec{x} - 1.
+\label{eq: fs}&lt;/script&gt;
+
+&lt;p&gt;where the subscript $i$ denotes the $i$th column of the matrix $A - \alpha I$,  and the extra equation $f_0(\vec{x}, \alpha, \vec{p}) = 0$ imposes the normalization constraint. Using Eq. $\eqref{eq: fs}$, one can easily obtain that&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\left( \frac{\partial f}{\partial \vec{x}} 	\right)^T \rightarrow
+\begin{pmatrix}
+	A - \alpha I &amp; 2\vec{x} \\
+	-\vec{x}^T &amp; 0
+\end{pmatrix}. %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;In correspondence with Eq. $\eqref{eq: lambda in general case}$ in the general case, the matrix equation satisfied by $\boldsymbol{\lambda}$ and $k$ thus yields&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;(A - \alpha I) \boldsymbol{\lambda} + 2k\vec{x} = \overline{\vec{x}}. \\
+-\vec{x}^T \boldsymbol{\lambda} = \overline{\alpha}.
+\label{eq: matrix equation of lambda and k}&lt;/script&gt;
+
+&lt;p&gt;One can solve for $k$ by multiplying both sides of the first equation by $\vec{x}^T$, and obtain&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;2k = \vec{x}^T \overline{\vec{x}}.&lt;/script&gt;
+
+&lt;p&gt;Substituting it back to Eq. $\eqref{eq: matrix equation of lambda and k}$, one can obtain the unique solution for $\boldsymbol{\lambda}$ as follows:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\boldsymbol{\lambda} = -\overline{\alpha} \vec{x} + \boldsymbol{\lambda_0}, \quad \textrm{where $\boldsymbol{\lambda_0}$ satisfies} \\
+\color{red}{
+(A - \alpha I)\boldsymbol{\lambda_0} = (1 - \vec{x}\vec{x}^T) \overline{\vec{x}}, \quad \vec{x}^T \boldsymbol{\lambda_0} = 0. }
+\label{lambda0}&lt;/script&gt;
+
+&lt;p&gt;The vector $\boldsymbol{\lambda_0}$ in the equation above can be solved by Conjugate Gradient (CG) method.&lt;/p&gt;
+
+&lt;p&gt;Finally, note that in the current case,&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\frac{\partial f}{\partial p_\mu} \rightarrow
+\begin{pmatrix}
+	\frac{\partial A}{\partial p_\mu} \vec{x} \\ 0
+\end{pmatrix}&lt;/script&gt;
+
+&lt;p&gt;In correspondence with Eq. $\eqref{eq: adjointp in general case}$, one thus obtains&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align}
+	\overline{p_\mu} &amp;= -\boldsymbol{\lambda}^T \frac{\partial A}{\partial p_\mu} \vec{x} \\
+	&amp;= (\overline{\alpha} \vec{x}^T - \boldsymbol{\lambda_0}^T) \frac{\partial A}{\partial p_\mu} \vec{x}.
+\end{align} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;Or, one can “strip” the parameter $\vec{p}$ out of the function primitive and obtain the expression of $\overline{A}$ by taking account of the fact that $\overline{p_\mu} = \textrm{Tr}\left(\overline{A}^T \frac{\partial A}{\partial p_\mu}\right)$. The final result is&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\color{red}{
+\overline{A} = (\overline{\alpha} \vec{x} - \boldsymbol{\lambda_0}) \vec{x}^T. }
+\label{result: dominant diagonalization}&lt;/script&gt;
+
+&lt;p&gt;Fairly simple.&lt;/p&gt;
+
+&lt;h3 id=&quot;relation-with-the-derivation-based-on-full-eigen-decomposition&quot;&gt;Relation with the derivation based on full eigen-decomposition&lt;/h3&gt;
+
+&lt;p&gt;Now, let’s try to figure out the relation of the above approach based on adjoint method with that of the full eigen-decomposition process. The only difference is that compared with the full diagonalization formulation, the adjoint method presented above only needs one specific eigenvalue(usually the smallest or the largest one) and corresponding eigenvectors. Nevertheless, we can “wrap” the process of full diagonalization within the dominant eigen-decomposition and utilize the results of the former formulation in the latter, as demonstrated in the figure below.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/2019-10-14-full_diagonalization.png&quot; alt=&quot;2019-10-14-full_diagonalization&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;For clarity and without loss of generality, let $\alpha$ and $\vec{x}$ be the “first” eigenvalue and corresponding eigenvector of the matrix $A$. That is, we have $U^T A U = D$, where&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+D = \begin{pmatrix}
+		\alpha \\
+		&amp; \alpha_2 \\
+		&amp; &amp; \ddots \\
+		&amp; &amp; &amp; \alpha_N
+	\end{pmatrix}, \quad 
+U = \begin{pmatrix}
+		\vert &amp; \vert &amp; &amp; \vert \\
+		\vec{x} &amp; \vec{x}_2 &amp; \cdots &amp; \vec{x}_N \\
+		\vert &amp; \vert &amp; &amp; \vert
+	\end{pmatrix} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;Recall that the full eigen-decomposition gives the following backward formula of $\overline{A}$ in terms of $\overline{D}$ and $\overline{U}$:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\overline{A} = U (\overline{D} \circ I + U^T \overline{U} \circ F) U^T.
+\label{eq: full diagonalization AD}&lt;/script&gt;
+
+&lt;p&gt;where $F$ is an anti-symmetric matrix with off-diagonal elements $F_{ij} = (\alpha_j - \alpha_i)^{-1}$. For more details, see the references in the last section. On the other hand, the dominant eigen-decomposition described above yields the following relations between $\overline{D}, \overline{U}$ and $\overline{\alpha}, \overline{\vec{x}}$:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\overline{D} \circ I = 
+	\begin{pmatrix}
+		\overline{\alpha} \\
+		&amp; 0 \\
+		&amp; &amp; \ddots \\
+		&amp; &amp; &amp; 0
+	\end{pmatrix}, \quad 
+\overline{U} = 
+	\begin{pmatrix}
+	\begin{array}{c|}
+		\vert \\
+		\overline{\vec{x}} \\
+		\vert
+	\end{array} &amp; 
+    \begin{array}{ccc}
+		\\ &amp; \Huge{0} &amp; \\ &amp; 
+	\end{array}
+	\end{pmatrix}. %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;Then one can obtain through simple algebraic manipulation that&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\overline{D} \circ I + U^T \overline{U} \circ F = 
+\begin{pmatrix}
+\begin{array}{c|}
+	\overline{\alpha} \\
+	\frac{1}{\alpha - \alpha_2} \vec{x}_2^T \overline{\vec{x}} \\
+	\vdots \\
+	\frac{1}{\alpha - \alpha_N} \vec{x}_N^T \overline{\vec{x}}
+\end{array} &amp; 
+\begin{array}{ccc}
+\\ &amp; \Huge{0} &amp; \\ &amp; 
+\end{array}
+\end{pmatrix} \equiv 
+\begin{pmatrix}
+\begin{array}{c|}
+	\overline{\alpha} \\
+	-c_2 \\
+	\vdots \\
+	-c_N
+\end{array} &amp; 
+\begin{array}{ccc}
+\\ &amp; \Huge{0} &amp; \\ &amp; 
+\end{array}
+\end{pmatrix}. %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;where we have introduced the quantities $c_i = \frac{1}{\alpha_i - \alpha} \vec{x}_i^T \overline{\vec{x}}, \quad \forall i = 2, \cdots, N$. Substituting this equation back into $\eqref{eq: full diagonalization AD}$, we have&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\overline{A} = \overline{\alpha} \vec{x} \vec{x}^T - \sum_{i=2}^N c_i \vec{x}_i \vec{x}^T.
+\label{result: full diagonalization}&lt;/script&gt;
+
+&lt;p&gt;This formula looks very similar to the result $\eqref{result: dominant diagonalization}$ obtained from the adjoint method. Actually they are &lt;strong&gt;identically the same&lt;/strong&gt;. This can be seen by expanding the vector $\boldsymbol{\lambda_0}$ characterized in Eq. $\eqref{lambda0}$ in the complete basis $(\vec{x}, \vec{x}_2, \cdots, \vec{x}_N)$. One can easily see that the quantities $c_i$ defined above are exactly the linear combination coefficients of $\boldsymbol{\lambda_0}$ in this basis. In other words, we have&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\boldsymbol{\lambda_0} = \sum_{i=2}^N c_i \vec{x}_i.&lt;/script&gt;
+
+&lt;p&gt;Plugging this result back into $\eqref{result: full diagonalization}$ clearly reproduces the earlier result $\eqref{result: dominant diagonalization}$.&lt;/p&gt;
+
+&lt;h3 id=&quot;remarks&quot;&gt;Remarks&lt;/h3&gt;
+
+&lt;p&gt;The observation above clarifies the equivalence of the two formulations of deriving the back-propagation of  the dominant eigen-decomposition process. &lt;strong&gt;The fact that the final result is identically the same is not surprising, but the “native” representations of the result are indeed different from a practical point of view&lt;/strong&gt;. In the formulation based on adjoint method, one only makes use of the “dominant” eigenvalue and eigenvector instead of the full spectrum, thus allowing for the construction of a valid dominant eigensolver function primitive in the framework of automatic differentiation. In a typical implementation, the forward pass can be accomplished by Lanczos or other dominant diagonalization algorithms, while the backward pass can be implemented by solving the linear system $\eqref{lambda0}$ using Conjugate Gradient method. In the case of large matrix dimension, this approach is clearly more efficient.&lt;/p&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;The presentation of general ideas of adjoint method and its application in dominant eigen-decomposition is largely based on this notes:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://math.mit.edu/~stevenj/18.336/adjoint.pdf&quot;&gt;https://math.mit.edu/~stevenj/18.336/adjoint.pdf&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;There are some good notes on automatic differentiation of basic matrix operations, including the full eigen-decomposition process. For example:&lt;/p&gt;
+
+&lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;https://people.maths.ox.ac.uk/gilesm/files/NA-08-01.pdf&quot;&gt;https://people.maths.ox.ac.uk/gilesm/files/NA-08-01.pdf&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://j-towns.github.io/papers/svd-derivative.pdf&quot;&gt;https://j-towns.github.io/papers/svd-derivative.pdf&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://arxiv.org/abs/1907.13422&quot;&gt;https://arxiv.org/abs/1907.13422&lt;/a&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;Complex valued SVD is defined as $A = USV^\dagger$. For simplicity, we consider a &lt;strong&gt;full rank square matrix&lt;/strong&gt; $A$.
-Differentiation gives&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;dA = dUSV^\dagger + U dS V^\dagger + USdV^\dagger&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;U^\dagger dA V = U^\dagger dU S + dS + SdV^\dagger V&lt;/script&gt;
-
-&lt;p&gt;Defining matrices $dC=U^\dagger dU$ and $dD = dV^\dagger V$ and $dP = U^\dagger dA V$, then we have&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{cases}dC^\dagger+dC=0,\\dD^\dagger +dD=0\end{cases}&lt;/script&gt;
-
-&lt;p&gt;We have&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;dP = dC S + dS + SdD&lt;/script&gt;
-
-&lt;p&gt;where $dCS$ and $SdD$ has zero real part in diagonal elements. So that $dS = \Re[{\rm diag}(dP)]$.&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align}
-d\mathcal{L} &amp;= {\rm Tr}\left[\overline{A}^TdA+\overline{A^*}^TdA^*\right]\\
-&amp;= {\rm Tr}\left[\overline{A}^TdA+dA^\dagger\overline{A}^*\right] ~~~~~~~\#rule~3
-\end{align} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;Easy to show $\overline A_s = U^*\overline SV^T$. Notice here, $\overline A$ is the &lt;strong&gt;derivative&lt;/strong&gt; rather than &lt;strong&gt;gradient&lt;/strong&gt;, they are different by a conjugate, this is why we have transpose rather than conjugate here. see my &lt;a href=&quot;https://giggleliu.github.io/2018/02/01/complex_bp.html&quot;&gt;complex valued autodiff blog&lt;/a&gt; for detail.&lt;/p&gt;
-
-&lt;p&gt;Using the relations $dC^\dagger+dC=0$ and $dD^\dagger+dD=0$&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{cases}
-dPS + SdP^\dagger &amp;= dC S^2-S^2dC\\
-SdP + dP^\dagger S &amp;= S^2dD-dD S^2
-\end{cases} %]]&gt;&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{cases}
-dC = F\circ(dPS+SdP^\dagger)\\
-dD = -F\circ (SdP+dP^\dagger S)
-\end{cases}&lt;/script&gt;
-
-&lt;p&gt;where $F_{ij} = \frac{1}{s_j^2-s_i^2}$, easy to verify $F^T = -F$. Notice here, the relation between the imaginary diagonal parts  is lost&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\color{red}{\Im[I\circ dP] = \Im[I\circ(dC+dD)]} ~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~\text{Eq. 1}&lt;/script&gt;
-
-&lt;p&gt;This &lt;strong&gt;the missing diagonal imaginary part&lt;/strong&gt; is definitely not trivial, but has been ignored for a long time until &lt;a href=&quot;https://github.com/tensorflow/tensorflow/issues/13641#issuecomment-526976200&quot;&gt;@refraction-ray&lt;/a&gt; (Shixin Zhang) mentioned and solved it. Let’s first focus on the off-diagonal contributions from $dU$&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align}
-{\rm Tr}\overline U^TdU &amp;= {\rm Tr} \overline U ^TU dC + \overline U^T (I-UU^\dagger) dAVS^{-1}\\
-&amp;= {\rm Tr}\overline U^T U (F\circ(dPS+SdP^\dagger))\\
- &amp;=  {\rm Tr}(dPS+SdP^\dagger)(-F\circ (\overline U^T U))~~~~~~~~~~~~~~\# rule~1,2\\
- &amp;= {\rm Tr}(dPS+SdP^\dagger)J^T
-\end{align} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;Here, we defined $J=F\circ(U^T\overline U)$.&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align}
-d\mathcal L &amp;= {\rm Tr} (dPS+SdP^\dagger)(J+J^\dagger)^T\\
-&amp;= {\rm Tr} dPS(J+J^\dagger)^T+h.c.\\
-&amp;= {\rm Tr} U^\dagger dA V S(J+J^\dagger)^T+h.c.\\
-&amp;= {\rm Tr}\left[ VS(J+J^\dagger)^TU^\dagger\right] dA+h.c.
-\end{align} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;By comparing with $d\mathcal L = {\rm Tr}\left[\overline{A}^TdA+h.c. \right]$, we have&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align}
-\bar A_U^{(\rm real)} &amp;=  \left[VS(J+J^\dagger)^TU^\dagger\right]^T\\
-&amp;=U^*(J+J^\dagger)SV^T
-\end{align} %]]&gt;&lt;/script&gt;
-
-&lt;h4 id=&quot;update-the-missing-diagonal-imaginary-part&quot;&gt;Update: The missing diagonal imaginary part&lt;/h4&gt;
-&lt;hr /&gt;
-
-&lt;p&gt;Now let’s inspect the diagonal imaginary parts of $dC$ and $dD$ in Eq. 1. At a first glance, it is not sufficient to derive $dC$ and $dD$ from $dP$, but consider there is still an information not used, &lt;strong&gt;the loss must be gauge invariant&lt;/strong&gt;, which means&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mathcal{L}(U\Lambda, S, V\Lambda)&lt;/script&gt;
-
-&lt;p&gt;Should be independent of the choice of gauge $\Lambda$, which is defined as ${\rm diag}(e^i\phi, …)$&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align}
-d\mathcal{L} &amp;={\rm Tr}[ \overline{U\Lambda}^T d(U\Lambda) +\overline  SdS+\overline{V\Lambda}^Td(V\Lambda)] + h.c.\\
-&amp;={\rm Tr}[ \overline {U\Lambda}^T (dU\Lambda+Ud\Lambda) +\overline{S}dS+  \overline{V\Lambda}^T(Vd\Lambda +dV\Lambda)] + h.c.\\
-&amp;= {\rm Tr}[(\overline{U\Lambda}^TU+\overline{V\Lambda}^TV )d\Lambda ] + \ldots + h.c.
-\end{align} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;Gauge invariance refers to&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\overline{\Lambda} =  I\circ(\overline{U\Lambda}^TU+\overline{V\Lambda}^TV) = 0&lt;/script&gt;
-
-&lt;p&gt;For any $\Lambda$, where $I$ refers to the diagonal mask matrix. It is of cause valid when $\Lambda\rightarrow1$, $I\circ(\overline{U}^TU+\overline V^TV) = 0$.&lt;/p&gt;
-
-&lt;p&gt;Consider the contribution from the &lt;strong&gt;diagonal imaginary part&lt;/strong&gt;, we have&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align}
-&amp;{\rm Tr} [\overline U^T U (I \circ \Im [dC])+\overline V^T V (I \circ \Im [dD^\dagger])] + h.c.\\
-&amp;={\rm Tr} [ I \circ (\overline U^T U)\Im [dC]-I\circ (\overline V^T V) \Im [dD]] +h.c. ~~~~~~~~~~~~~~\#  rule 1\\
-&amp;={\rm Tr} [ I \circ (\overline U^T U)(\Im [dC]+ \Im [dD])] \\
-&amp;={\rm Tr}[I\circ (\overline U^T U) \Im[dP]S^{-1}]  \\
-&amp;={\rm Tr}[S^{-1}\Lambda_J U^{\dagger}dA V]\\
-\end{align} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;where $\Lambda_J  = \Im[I\circ(\overline U^TU)]= \frac 1 2I\circ(\overline U^TU)-h.c.$, with $I$ the mask for diagonal part. Since only the real part contribute to $\delta \mathcal{L}$ (the imaginary part will be canceled by the Hermitian conjugate counterpart), we can safely move $\Im$ from right to left.&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align}
-\color{red}{\bar A_{U+V}^{(\rm imag)} = U^*\Lambda_J S^{-1}V^T}
-\end{align}&lt;/script&gt;
-
-&lt;p&gt;&lt;strong&gt;Thanks  &lt;a href=&quot;https://github.com/refraction-ray&quot;&gt;@refraction-ray&lt;/a&gt; (Shixin Zhang) for sharing his idea in the first time. This is the &lt;a href=&quot;https://github.com/tensorflow/tensorflow/issues/13641#issuecomment-526976200&quot;&gt;issue for discussion&lt;/a&gt;. His arXiv preprint is coming out soon.&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;When $U$ is &lt;strong&gt;not full rank&lt;/strong&gt;, this formula should take an extra term (Ref. 2)&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align}
-\bar A_U^{(\rm real)} &amp;=U^*(J+J^\dagger)SV^T + (VS^{-1}\overline U^T(I-UU^\dagger))^T
-\end{align} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;Similarly, for $V​$ we have&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align}
-\overline A_V^{(\rm real)} &amp;=U^*S(K+K^\dagger)V^T + (U S^{-1} \overline V^T (I - VV^\dagger))^*,
-\end{align} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;where $K=F\circ(V^T\overline V)​$.&lt;/p&gt;
-
-&lt;p&gt;To wrap up&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\overline A = \overline A_U^{\rm (real)} + \overline A_S + \overline A_V^{\rm (real)} +  \overline A_{U+V}^{\rm (imag)}&lt;/script&gt;
-
-&lt;p&gt;This result can be directly used in &lt;strong&gt;autograd&lt;/strong&gt;.&lt;/p&gt;
-
-&lt;p&gt;For the &lt;strong&gt;gradient&lt;/strong&gt; used in training, one should change the convention&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\mathcal{\overline A} = \overline A^*,\\ \mathcal{\overline U} = \overline U^*,\\ \mathcal{\overline V}= \overline V^*.&lt;/script&gt;
-
-&lt;p&gt;This convention is used in &lt;strong&gt;tensorflow&lt;/strong&gt;, &lt;strong&gt;Zygote.jl&lt;/strong&gt;. Which is&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align}
-\mathcal{\overline A} =&amp; U(\mathcal{J}+\mathcal{J}^\dagger)SV^\dagger + (I-UU^\dagger)\mathcal{\overline U}S^{-1}V^\dagger\\
-&amp;+ U\overline SV^\dagger\\
-&amp;+US(\mathcal{K}+\mathcal{K}^\dagger)V^\dagger + U S^{-1} \mathcal{\overline V}^\dagger (I - VV^\dagger)\\
-&amp;\color{red}{+\frac 1 2 U (I\circ(U^\dagger\overline U)-h.c.)S^{-1}V^\dagger}
-\end{align} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;where $J=F\circ(U^\dagger\mathcal{\overline U})$ and $K=F\circ(V^\dagger \mathcal{\overline V})$.&lt;/p&gt;
-
-&lt;h3 id=&quot;rules&quot;&gt;Rules&lt;/h3&gt;
-
-&lt;p&gt;rule 1. ${\rm Tr} \left[A(C\circ B\right)] = \sum A^T\circ C\circ B = {\rm Tr} ((C\circ A^T)^TB)={\rm Tr}(C^T\circ A)B$&lt;/p&gt;
-
-&lt;p&gt;rule2. $(C\circ A)^T = C^T \circ A^T$&lt;/p&gt;
-
-&lt;p&gt;rule3. When $\mathcal L$ is real, &lt;script type=&quot;math/tex&quot;&gt;\frac{\partial \mathcal{L}}{\partial x^*} =  \left(\frac{\partial \mathcal{L}}{\partial x}\right)^*&lt;/script&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;how-to-test-svd&quot;&gt;How to Test SVD&lt;/h3&gt;
-
-&lt;p&gt;e.g. To test the adjoint contribution from $U$, we can construct a gauge insensitive  test function&lt;/p&gt;
-
-&lt;div class=&quot;language-julia highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# H is a random Hermitian Matrix&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt; loss&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;V&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;svd&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;psi&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;]&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;psi&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;H&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;psi&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt; gradient&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;V&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;svd&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;dU&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;zero&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;dS&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;zero&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;dV&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;zero&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;V&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;dU&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;H&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;dA&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;svd_back&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;U&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;S&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;V&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dU&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dS&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dV&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;dA&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;qr-decomposition&quot;&gt;QR decomposition&lt;/h2&gt;
-&lt;hr /&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;A = QR&lt;/script&gt;
-
-&lt;p&gt;with $Q^\dagger Q = \mathbb{I}$, so that $dQ^\dagger Q+Q^\dagger dQ=0$. $R$ is a complex upper triangular matrix, with diagonal part real.
-&lt;script type=&quot;math/tex&quot;&gt;dA = dQR+QdR&lt;/script&gt;&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;dQ = dAR^{-1}-QdRR^{-1}&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{cases}
-Q^\dagger dQ = dC - dRR^{-1}\\
-dQ^\dagger Q =dC^\dagger - R^{-\dagger}dR^\dagger
-\end{cases}&lt;/script&gt;
-
-&lt;p&gt;where $dC=Q^\dagger dAR^{-1}$.&lt;/p&gt;
-
-&lt;p&gt;Then&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;dC+dC^\dagger = dRR^{-1} +(dRR^{-1})^\dagger&lt;/script&gt;
-
-&lt;p&gt;Notice $dR$ is upper triangular and its diag is lower triangular, this restriction gives&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;U\circ(dC+dC^\dagger) = dRR^{-1}&lt;/script&gt;
-
-&lt;p&gt;where $U$ is a mask operator that its element value is $1$ for upper triangular part, $0.5$ for diagonal part and $0$ for lower triangular part. One should also notice here both $R$ and $dR$ has real diagonal parts, as well as the product $dRR^{-1}$.&lt;/p&gt;
-
-&lt;p&gt;Now let’s wrap up using the Zygote convension of gradient&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align}
-d\mathcal L &amp;= {\rm Tr}\left[\overline{\mathcal{Q}}^\dagger dQ+\overline{\mathcal{R}}^\dagger dR +h.c. \right]\\
-&amp;={\rm Tr}\left[\overline{\mathcal{Q}}^\dagger dA R^{-1}-\overline{\mathcal{Q}}^\dagger QdR
-R^{-1}+\overline{\mathcal{R}}^\dagger dR +h.c. \right]\\
-&amp;={\rm Tr}\left[ R^{-1}\overline{\mathcal{Q}}^\dagger dA+ R^{-1}(-\overline{\mathcal{Q}}^\dagger Q +R\overline{\mathcal{R}}^\dagger) dR +h.c. \right]\\
-&amp;={\rm Tr}\left[ R^{-1}\overline{\mathcal{Q}}^\dagger dA+ R^{-1}M dR +h.c. \right]
-\end{align} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;here, $M=R\overline{\mathcal{R}}^\dagger-\overline{\mathcal{Q}}^\dagger Q$. Plug in $dR$ we have&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align}
-d\mathcal{L}&amp;={\rm Tr}\left[ R^{-1}\overline{\mathcal{Q}}^\dagger dA + M \left[U\circ(dC+dC^\dagger)\right] +h.c. \right]\\
-&amp;={\rm Tr}\left[ R^{-1}\overline{\mathcal{Q}}^\dagger dA + (M\circ L)(dC+dC^\dagger) +h.c. \right]  \;\;\# rule\; 1\\
-&amp;={\rm Tr}\left[ (R^{-1}\overline{\mathcal{Q}}^\dagger dA+h.c.) + (M\circ L)(dC + dC^\dagger)+ (M\circ L)^\dagger (dC + dC^\dagger)\right]\\
-&amp;={\rm Tr}\left[ R^{-1}\overline{\mathcal{Q}}^\dagger dA + (M\circ L+h.c.)dC + h.c.\right]\\
-&amp;={\rm Tr}\left[ R^{-1}\overline{\mathcal{Q}}^\dagger dA + (M\circ L+h.c.)Q^\dagger dAR^{-1}\right]+h.c.\\
-\end{align} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;where $L =U^\dagger = 1-U$ is the mask of lower triangular part of a matrix.&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align}
-\mathcal{\overline A}^\dagger &amp;= R^{-1}\left[\overline{\mathcal{Q}}^\dagger + (M\circ L+h.c.)Q^\dagger\right]\\
-\mathcal{\overline A} &amp;= \left[\overline{\mathcal{Q}} + Q(M\circ L+h.c.)\right]R^{-\dagger}\\
-&amp;=\left[\overline{\mathcal{Q}} + Q \texttt{copyltu}(M)\right]R^{-\dagger}
-\end{align} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;Here, the $\texttt{copyltu}​$ takes conjugate when copying elements to upper triangular part.&lt;/p&gt;
+&lt;/ul&gt;
 </description>
-        <pubDate>Sun, 13 Oct 2019 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/2019/10/test/</link>
-        <guid isPermaLink="true">http://localhost:4000/2019/10/test/</guid>
+        <pubDate>Tue, 15 Oct 2019 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/2019/10/adjoint-method/</link>
+        <guid isPermaLink="true">http://localhost:4000/2019/10/adjoint-method/</guid>
         
         
       </item>
