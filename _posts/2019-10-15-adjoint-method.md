@@ -11,7 +11,6 @@ typora-root-url: /home/hendry/Documents/buwantaiji.github.io/
 </script>
 
 <script type="text/x-mathjax-config">   MathJax.Hub.Config({     TeX: { equationNumbers: { autoNumber: "all" } }   }); </script>
-
 The adjoint method provides a new way of thinking about and deriving  formulas for certain computation process. In this article, we will present the basic ideas of the adjoint method and, as a concrete example, demonstrate its consequences in back-propagation of the dominant eigen-decomposition and its relation with the traditional approach.
 
 $\renewcommand{\vec}[1]{\mathbf{#1}}$
@@ -185,14 +184,14 @@ Substituting it back to Eq. $\eqref{eq: matrix equation of lambda and k}$, one c
 
 
 $$
-\boldsymbol{\lambda} = -\overline{\alpha} \vec{x} + \boldsymbol{\lambda_0}, \quad \textrm{where $\boldsymbol{\lambda_0}$ satisfies} \\
+\boldsymbol{\lambda} = -\overline{\alpha} \vec{x} + \boldsymbol{\lambda}_0, \quad \textrm{where $\boldsymbol{\lambda}_0$ satisfies} \\
 \color{red}{
-(A - \alpha I)\boldsymbol{\lambda_0} = (1 - \vec{x}\vec{x}^T) \overline{\vec{x}}, \quad \vec{x}^T \boldsymbol{\lambda_0} = 0. }
+(A - \alpha I)\boldsymbol{\lambda}_0 = (1 - \vec{x}\vec{x}^T) \overline{\vec{x}}, \quad \vec{x}^T \boldsymbol{\lambda}_0 = 0. }
 \label{lambda0}
 $$
 
 
-The vector $\boldsymbol{\lambda_0}$ in the equation above can be solved by Conjugate Gradient (CG) method.  
+The vector $\boldsymbol{\lambda}_0$ in the equation above can be solved by Conjugate Gradient (CG) method.  
 
 
 
@@ -212,7 +211,7 @@ In correspondence with Eq. $\eqref{eq: adjointp in general case}$, one thus obta
 $$
 \begin{align}
 	\overline{p_\mu} &= -\boldsymbol{\lambda}^T \frac{\partial A}{\partial p_\mu} \vec{x} \\
-	&= (\overline{\alpha} \vec{x}^T - \boldsymbol{\lambda_0}^T) \frac{\partial A}{\partial p_\mu} \vec{x}.
+	&= (\overline{\alpha} \vec{x}^T - \boldsymbol{\lambda}_0^T) \frac{\partial A}{\partial p_\mu} \vec{x}.
 \end{align}
 $$
 
@@ -222,7 +221,7 @@ Or, one can "strip" the parameter $\vec{p}$ out of the function primitive and ob
 
 $$
 \color{red}{
-\overline{A} = (\overline{\alpha} \vec{x} - \boldsymbol{\lambda_0}) \vec{x}^T. }
+\overline{A} = (\overline{\alpha} \vec{x} - \boldsymbol{\lambda}_0) \vec{x}^T. }
 \label{result: dominant diagonalization}
 $$
 
@@ -328,11 +327,11 @@ $$
 $$
 
 
-This formula looks very similar to the result $\eqref{result: dominant diagonalization}$ obtained from the adjoint method. Actually they are **identically the same**. This can be seen by expanding the vector $\boldsymbol{\lambda_0}$ characterized in Eq. $\eqref{lambda0}$ in the complete basis $(\vec{x}, \vec{x}_2, \cdots, \vec{x}_N)$. One can easily see that the quantities $c_i$ defined above are exactly the linear combination coefficients of $\boldsymbol{\lambda_0}$ in this basis. In other words, we have
+This formula looks very similar to the result $\eqref{result: dominant diagonalization}$ obtained from the adjoint method. Actually they are **identically the same**. This can be seen by expanding the vector $\boldsymbol{\lambda}_0$ characterized in Eq. $\eqref{lambda0}$ in the complete basis $(\vec{x}, \vec{x}_2, \cdots, \vec{x}_N)$. One can easily see that the quantities $c_i$ defined above are exactly the linear combination coefficients of $\boldsymbol{\lambda}_0$ in this basis. In other words, we have
 
 
 $$
-\boldsymbol{\lambda_0} = \sum_{i=2}^N c_i \vec{x}_i.
+\boldsymbol{\lambda}_0 = \sum_{i=2}^N c_i \vec{x}_i.
 $$
 
 
