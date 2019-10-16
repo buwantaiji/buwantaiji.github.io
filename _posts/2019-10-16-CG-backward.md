@@ -222,7 +222,7 @@ where we have again used the relations $\eqref{eq: A}$, $\eqref{eq: orthogonal r
 
 $$
 \color{red}{
-\textrm{$\overline{\vec{b}}$ satisfies }A \overline{\vec{b}} = (1 - \alpha \alpha^T) \overline{\vec{x}}, \quad \vec{x}^T \overline{\vec{b}} = 0, \\
+\textrm{$\overline{\vec{b}}$ satisfies }A \overline{\vec{b}} = (1 - \alpha \alpha^T) \overline{\vec{x}}, \quad \alpha^T \overline{\vec{b}} = 0, \\
 \overline{A} = - \overline{\vec{b}} \vec{x}^T, \\
 \overline{\alpha} = - \vec{x} \alpha^T \overline{\vec{x}}. }
 \label{eq: low-rank linear system solver AD}
